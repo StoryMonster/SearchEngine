@@ -1,0 +1,85 @@
+========================需求========================
+ 1. 制作一个搜索引擎，输入多个关键字进行搜索
+ 2. 能查询的网页不下于10个                  
+ 3. 显示搜索结果列表                        
+ 4. 进入网页后显示更多与关键字相关的内容    
+ 5. 允许下载网页内容                        
+
+
+
+=============================================================设计====================================================================================================
+1. 使用类SearchEngine来定义整个系统的属性与行为
+2. SearchEngine的属性设计如下：
+	(1) lstWebsites      list,    需要爬虫的网页集合，元素类型为字符串
+	(2) lstSearchedItems list,    搜索的所有网页条目，元素类型为元组(编号,网址,关键字相关文字)
+	(3) lstKeywords      list,    输入的关键字集合，空格和分号区分关键字
+	(4) strKeywords      string,  关键字的输入原文
+	(5) cmdCommand		 string,  进入命令状态, cmdCommand = 'command'
+	(6) cmdKeywords		 string,  进入关键词输入状态, cmdCommand = 'keywords'
+	(7) cmdQuit			 string,  退出程序,cmdQuit = 'q'
+	(8) cmdBack			 string,  返回,cmdBack = 'b'
+	(9)cmdNextPage		 string,  下一页, cmdNextPage = 'n'
+	(10)cmdLastPage		 string,  上一页, cmdPrevPage = 'l'
+	(11)cmdRefresh		 string,  刷新页面, cmdRefresh = 'r'
+	(12)cmdSavePage		 string,  下载当前网页, cmdSavePage = 's'
+	(13)iItemsEachPage	 integer, 每页显示的条目数量
+	(14)iCurrentPage	 integer, 当前页码
+	(15)strConfigFile	 string,  配置文件的路径, strConfigFile = './config.ini'
+	(16)strSurface		 string,  界面状态，strSurface = enum{'MAIN_SURFACE', 'SEARCH_SURFACE', 'DETAIL_SURFACE'}	
+	
+3. SearchEngine的行为设计如下:
+	(1) initCommand(self)					命令初始化
+	(2) work(self)		           			系统进入工作状态(默认关键字输入状态),打开主界面
+	(3) mainSurface(self,info)     			主界面。info界面显示的提示信息
+	(4) searchSurface(self,info)			搜索界面
+	(5) downWebsite(self,urlpath)			下载网页。urlpath，要下载的网页地址。返回下载状态
+	(6) detailSurface(self,info,urlpath,content) 具体网页进入后的界面, content 具体的网页内容
+	(7) getWebContext(self,urlpath)			获取urlpath指定网页的更为详细的与keywords相关的信息
+	(8) useCommandInput(self,surfaceStatus)	进入命令输入状态, surfaceStatus当前界面状态。
+	(9) useKeywordsInput(self)				进入关键字输入状态
+	(10)divideKeywords(self)				划分输入的关键字字符串为有效关键字列表
+	(11)getAbstractContext(self,urlpath)    获取简要的与关键字相关的信息. 在此过程中, 搜索到关键字就将相关信息存入lstSearchedItems,并且返回true,若否返回false
+	(12)readConfigFile(self)				读取配置文件
+	(13)startSearch(self)					开始搜索
+
+4. 日志类 SearchEngineLog
+	日志文件: ./SearchEngine.log
+	每一条日志内容: 时间（精确到妙），异常类型，详细内容
+	每一条日志占用一行
+	属性：
+		strLogFile		string, 日志文件路径
+		iMaxLogItems	integer,最大保存日志条目数量
+		iCurrentItems	integer,当前日志文件中已保存的日志条目数量
+	行为：
+		searchLog(self,strKeywords)			记录搜索事件, strKeywords搜索内容
+		webLog(self,webPath)				记录打开网页事件，webPath网页路径
+		errorLog(self,errInfo)				记录发生错误事件,errInfo,错误信息
+		downloadLog(self,info)				记录下载事件
+		writeLog(self,type,info)			写入事件，type事件类型，info事件信息
+		createLogFile(self)					创建日志文件，若已有日志文件则不做任何处理
+		clearLogFile(self)					清空日志文件，若没有日志文件，则CreateLogFile
+		getCurrTime(self)					返回当前时间，格式YYYY-MM-DD hh:mm:ss
+		setMaxLogItemNum(self,num)			设置最大保存日志条数
+		getMaxLogItemNum(self,num)			获取最大保存日志条数
+		getCurrentLogItemsCount(self)		获取当前已保存日志条数
+5. 命令和关键字
+	在关键字状态下输入command进入命令状态
+	在命令状态下输入keywords进入关键字状态
+	命令：
+		q  ---  退出				b  ----  返回
+		n  ---  下一页              l  ----  上一页
+		r  ---  刷新                on ----  进入第n条结果
+		s  ---  下载当前网页        gn ----  跳转到第n页
+6. 配置文件
+	路径 : ./config.ini
+	内容 : 网址列表，每一个网址占用一行
+	
+
+
+
+
+
+
+
+
+
