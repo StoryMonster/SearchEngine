@@ -3,7 +3,6 @@
 import urllib
 import os
 import re
-import HtmlToText
 import SearchEngineLog
 
 class SearchEngine:
